@@ -27,6 +27,8 @@ local SmerValue = ValuesFolder:WaitForChild("Smer")
 local SurfaceGui = PPModel:WaitForChild("Display"):WaitForChild("SurfaceGui")
 
 local BeepSound = PPModel.Main.Pip
+local DisplayColor = configData.displayColor
+local BlackColor = Color3.fromRGB(51, 52, 56)
 
 local state = 0
 --1 = mainmenu
@@ -37,31 +39,131 @@ local function removeWhiteSpaces(str : string) : string
 	return string.gsub(tostring(str), "%s+", "")
 end
 
-local function setLine(int: number)
-	for _, v : Instance in pairs(panelyModel:GetDescendants()) do
-		if v.Name == "Num" and v:IsA("TextLabel") then
-			v.Text = tostring(int)
+local function resizeThePanel(linkaNumber : number)
+	if removeWhiteSpaces(linkaNumber) ~= "" then
+		for _, value in panelyModel:GetChildren() do
+			if value.Name == "Predek" or value.Name == "Bok" then
+				value.SurfaceGui.Text.Position = UDim2.new(0.215,0,0,0)
+				value.SurfaceGui.Text.Size = UDim2.new(0.785,0,1,0)
+				value.SurfaceGui.Line1.Position = UDim2.new(0.2,0,0,0)
+				value.SurfaceGui.Line1.Size = UDim2.new(0.8,0,0.5,0)
+				value.SurfaceGui.Line2.Size = UDim2.new(0.8,0,0.5,0)
+				value.SurfaceGui.Line2.Position = UDim2.new(0.2,0,0.5,0)
+			end
+		end
+	else
+		for _, value in panelyModel:GetChildren() do
+			if value.Name == "Predek" or value.Name == "Bok" then
+				value.SurfaceGui.Text.Position = UDim2.new(0,0,0,0)
+				value.SurfaceGui.Text.Size = UDim2.new(1,0,1,0)
+				value.SurfaceGui.Line1.Position = UDim2.new(0,0,0,0)
+				value.SurfaceGui.Line1.Size = UDim2.new(1,0,0.5,0)
+				value.SurfaceGui.Line2.Position = UDim2.new(0,0,0.5,0)
+				value.SurfaceGui.Line2.Size = UDim2.new(1,0,0.5,0)
+			end
 		end
 	end
-	if removeWhiteSpaces(int) ~= "" then
+end
+
+local function clearPanel()
+	panelyModel.Predek.SurfaceGui.Text.Text = ""
+	panelyModel.Predek.SurfaceGui.Line1.Text = ""
+	panelyModel.Predek.SurfaceGui.Line2.Text = ""
+	panelyModel.Bok.SurfaceGui.Text.Text = ""
+	panelyModel.Bok.SurfaceGui.Line1.Text = ""
+	panelyModel.Bok.SurfaceGui.Line2.Text = ""
+end
+
+local function setLine(int: number)
+	task.wait(2)
+	local formattedInput = removeWhiteSpaces(int)
+	resizeThePanel(int)
+	if formattedInput ~= "" then
 		SurfaceGui.MainMenu.Linka.Text = "L"..int
 	else
 		SurfaceGui.MainMenu.Linka.Text = "Lprázd"
 	end
+	panelyModel.Predek.SurfaceGui.Num.Text = formattedInput
+	panelyModel.Bok.SurfaceGui.Num.Text = formattedInput
+	panelyModel.Zadek.SurfaceGui.Num.Text = formattedInput
 end
 
-local function setDestination(obj : table, isItLine : boolean, lineNumber, dirNumber)
-	isItLine = isItLine or false
-	lineNumber = lineNumber or nil
-	dirNumber = dirNumber or nil
-	if not isItLine then
-		local buseInfo = obj.info[1]
-		local frontInfo = obj.info[2]
-		local sideInfo = obj.info[3]
-		panelyModel.Predek.SurfaceGui.Text.Text = frontInfo
-		panelyModel.Bok.SurfaceGui.Text.Text = sideInfo
-		SurfaceGui.MainMenu.CilText.Text = buseInfo
-		SurfaceGui.MainMenu.CilNum.Text = obj.id
+local function invertPanel(textLabel : TextLabel, invert : boolean)
+	if invert then
+		textLabel.BackgroundColor3 = DisplayColor
+		textLabel.TextColor3 = BlackColor
+	else
+		textLabel.BackgroundColor3 = BlackColor
+		textLabel.TextColor3 = DisplayColor
+	end
+end
+
+local function setDestination(obj : table)
+	task.wait(2)
+	local buseInfo = obj.info[1] or "Cprázd"
+	local frontInfo = obj.info[2] or ""
+	local sideInfo = obj.info[3] or ""
+	SurfaceGui.MainMenu.CilText.Text = buseInfo
+	SurfaceGui.MainMenu.CilNum.Text = obj.id or "000"
+	local splittedStringFront = string.split(frontInfo, "*/t")
+	local splittedStringSide = string.split(sideInfo, "*/t")
+
+	resizeThePanel(LinkaValue.Value)
+	clearPanel()
+
+	if #splittedStringFront >= 2 then
+		if string.match(splittedStringFront[1], "*/i") then
+			invertPanel(panelyModel.Predek.SurfaceGui.Line1, true)
+		else
+			invertPanel(panelyModel.Predek.SurfaceGui.Line1, false)
+		end
+		if string.match(splittedStringFront[2], "*/i") then
+			invertPanel(panelyModel.Predek.SurfaceGui.Line2, true)
+		else
+			invertPanel(panelyModel.Predek.SurfaceGui.Line2, false)
+		end
+		panelyModel.Predek.SurfaceGui.Line1.Visible = true
+		panelyModel.Predek.SurfaceGui.Line2.Visible = true
+		panelyModel.Predek.SurfaceGui.Text.Visible = false
+		panelyModel.Predek.SurfaceGui.Line1.Text = string.gsub(splittedStringFront[1], "*/i", "")
+		panelyModel.Predek.SurfaceGui.Line2.Text = string.gsub(splittedStringFront[2], "*/i", "")
+	else
+		if string.match(splittedStringFront[1], "*/i") then
+			invertPanel(panelyModel.Predek.SurfaceGui.Text, true)
+		else
+			invertPanel(panelyModel.Predek.SurfaceGui.Text, false)
+		end
+		panelyModel.Predek.SurfaceGui.Line1.Visible = false
+		panelyModel.Predek.SurfaceGui.Line2.Visible = false
+		panelyModel.Predek.SurfaceGui.Text.Visible = true
+		panelyModel.Predek.SurfaceGui.Text.Text = string.gsub(splittedStringFront[1], "*/i", "")
+	end
+	if #splittedStringSide >= 2 then
+		if string.match(splittedStringSide[1], "*/i") then
+			invertPanel(panelyModel.Bok.SurfaceGui.Line1, true)
+		else
+			invertPanel(panelyModel.Bok.SurfaceGui.Line1, false)
+		end
+		if string.match(splittedStringSide[2], "*/i") then
+			invertPanel(panelyModel.Bok.SurfaceGui.Line2, true)
+		else
+			invertPanel(panelyModel.Bok.SurfaceGui.Line2, false)
+		end
+		panelyModel.Bok.SurfaceGui.Line1.Visible = true
+		panelyModel.Bok.SurfaceGui.Line2.Visible = true
+		panelyModel.Bok.SurfaceGui.Text.Visible = false
+		panelyModel.Bok.SurfaceGui.Line1.Text = string.gsub(splittedStringSide[1], "*/i", "")
+		panelyModel.Bok.SurfaceGui.Line2.Text = string.gsub(splittedStringSide[2], "*/i", "")
+	else
+		if string.match(splittedStringSide[1], "*/i") then
+			invertPanel(panelyModel.Bok.SurfaceGui.Text, true)
+		else
+			invertPanel(panelyModel.Bok.SurfaceGui.Text, false)
+		end
+		panelyModel.Bok.SurfaceGui.Line1.Visible = false
+		panelyModel.Bok.SurfaceGui.Line2.Visible = false
+		panelyModel.Bok.SurfaceGui.Text.Visible = true
+		panelyModel.Bok.SurfaceGui.Text.Text = string.gsub(splittedStringSide[1], "*/i", "")
 	end
 end
 
@@ -119,7 +221,7 @@ local function setNum1()
 	state = 2
 	linka.Visible = true
 	repeat
-		linka.Text = "Linka: >"..input.."<"
+		linka.Text = ("Linka: >%s<"):format(input)
 		task.wait()
 		if state == 1 then
 			return
@@ -130,7 +232,7 @@ local function setNum1()
 	input = "     "
 	kurz.Visible = true
 	repeat
-		kurz.Text = "Kurz: >"..input.."<"
+		kurz.Text = ("Kurz: >%s<"):format(input)
 		task.wait()
 		if state == 1 then
 			return
@@ -152,7 +254,7 @@ local function setNum2()
 	local savedCilText = SurfaceGui.MainMenu.CilText.Text
 	local savedCilNum = SurfaceGui.MainMenu.CilNum.Text
 	repeat
-		cil.Text = "Cil: >"..input.."<"
+		cil.Text = ("Cil: >%s<"):format(input)
 		task.wait()
 		local obj = findCilObject(input)
 		SurfaceGui.MainMenu.CilText.Text = obj.info[1]
@@ -176,7 +278,7 @@ local function setNum5()
 	state = 7
 	pasmo.Visible = true
 	repeat
-		pasmo.Text = "Zóna: >"..input.."<"
+		pasmo.Text = ("Zóna: >%s<"):format(input)
 		task.wait()
 		if state == 1 then
 			return
@@ -197,7 +299,7 @@ local function setNum6()
 	local savedCilText = SurfaceGui.MainMenu.CilText.Text
 	local savedCilNum = SurfaceGui.MainMenu.CilNum.Text
 	repeat
-		smer.Text = "Směr: >"..input.."<"
+		smer.Text = ("Směr: >%s<"):format(input)
 		task.wait()
 		local cil = findRefCilBySmerAndLine(LinkaValue.Value, input)
 		local obj = findCilObject(cil)
@@ -310,7 +412,7 @@ PPModel.Buttons.Num3.ClickDetector.MouseClick:Connect(function()
 end)
 
 PPModel.Buttons.Num4.ClickDetector.MouseClick:Connect(function()
-	if state > 1 then	
+	if state > 1 then
 		appendNumber(4)
 	end
 end)
@@ -327,7 +429,7 @@ PPModel.Buttons.Num6.ClickDetector.MouseClick:Connect(function()
 	if state == 1 then
 		setNum6()
 	elseif state > 1 then
-		appendNumber(6)	
+		appendNumber(6)
 	end
 end)
 

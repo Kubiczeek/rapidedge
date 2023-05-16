@@ -14,7 +14,23 @@ local data = {
 		},
 		{
 			["id"]="2",
-			["info"] = {"KAČEROV", "Kačerov", "Kačrov"}
+			["info"] = {"KAČEROV", "*/iKačerov", "Kačrov"}
+		},
+		{
+			["id"]="3",
+			["info"] = {"HŘBITOV", "Havlíčkův Brod, Kopka,*/trocestí, hřbitov*/i", "*/iHavlíčkův Brod, Kopka,*/trocestí, hřbitov"}
+		},
+		{
+			["id"]="4",
+			["info"] = {"TEST", "First row front*/tSecond row front inverted*/i", "First row side inverted*/i*/tSecond row side default"}
+		},
+		{
+			["id"]="5",
+			["info"] = {"TEST2", "Text across front panel normal", "First row side default*/t*/iSecond row side inverted"}
+		},
+		{
+			["id"]="6",
+			["info"] = {"TEST3", "Text across front panel inverted", "Long text that will be automaticaly put on two lines"}
 		},
 		{
 			["id"]="999",
