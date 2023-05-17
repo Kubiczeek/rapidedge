@@ -10,7 +10,7 @@ local data = {
 	["cil"] = {
 		{
 			["id"]="1",
-			["info"] = {"SÍDL.LIB.", "Sídliště Libuš", "Sídliště Libuššš"}
+			["info"] = {"SÍDL.LIB.", "Sídliště Libuš", "Sídliště Libuš"}
 		},
 		{
 			["id"]="2",
@@ -43,7 +43,7 @@ local data = {
 			{
 				["smer"] = 1,
 				["refCil"] = 1,
-				["showedLineNum"] = "215",
+				["showedLineNum"] = "A*/i",
 			},
 			{
 				["smer"] = 2,

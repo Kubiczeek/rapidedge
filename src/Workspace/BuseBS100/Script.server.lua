@@ -88,6 +88,39 @@ local function setLine(int: number)
 	panelyModel.Zadek.SurfaceGui.Num.Text = formattedInput
 end
 
+local function setSmer(linka : number, smer :number)
+	local linkaTable = panelyData.linka[linka]
+	local dest
+	for _, v in linkaTable do
+		if removeWhiteSpaces(v.smer) == removeWhiteSpaces(smer) then
+			dest = v
+			break
+		end
+	end
+	local formattedInput = removeWhiteSpaces(dest.showedLineNum)
+
+	if string.match(formattedInput, "*/i") then
+		panelyModel.Predek.SurfaceGui.Num.TextColor3 = BlackColor
+		panelyModel.Predek.SurfaceGui.Num.BackgroundColor3 = DisplayColor
+		panelyModel.Bok.SurfaceGui.Num.TextColor3 = BlackColor
+		panelyModel.Bok.SurfaceGui.Num.BackgroundColor3 = DisplayColor
+		panelyModel.Zadek.SurfaceGui.Num.TextColor3 = BlackColor
+		panelyModel.Zadek.SurfaceGui.Num.BackgroundColor3 = DisplayColor
+		formattedInput = string.gsub(formattedInput, "*/i", "")
+	else
+		panelyModel.Predek.SurfaceGui.Num.TextColor3 = DisplayColor
+		panelyModel.Predek.SurfaceGui.Num.BackgroundColor3 = BlackColor
+		panelyModel.Bok.SurfaceGui.Num.TextColor3 = DisplayColor
+		panelyModel.Bok.SurfaceGui.Num.BackgroundColor3 = BlackColor
+		panelyModel.Zadek.SurfaceGui.Num.TextColor3 = DisplayColor
+		panelyModel.Zadek.SurfaceGui.Num.BackgroundColor3 = BlackColor
+	end
+
+	panelyModel.Predek.SurfaceGui.Num.Text = formattedInput
+	panelyModel.Bok.SurfaceGui.Num.Text = formattedInput
+	panelyModel.Zadek.SurfaceGui.Num.Text = formattedInput
+end
+
 local function invertPanel(textLabel : TextLabel, invert : boolean)
 	if invert then
 		textLabel.BackgroundColor3 = DisplayColor
@@ -491,6 +524,7 @@ SmerValue:GetPropertyChangedSignal("Value"):Connect(function()
 		CilValue.Value = "nil"
 		local cil = findRefCilBySmerAndLine(LinkaValue.Value, SmerValue.Value)
 		setDestination(findCilObject(cil))
+		setSmer(LinkaValue.Value, SmerValue.Value)
 	end
 end)
 
